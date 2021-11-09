@@ -1,5 +1,5 @@
 // import './style.css';
-import nflplayer from './players.json';
+var nflplayer = require('./players.json')
 // export { userMap };
 
 // Write Javascript code!
