@@ -1,16 +1,45 @@
 // import './style.css';
-
+import nflplayer from './players.json';
 // export { userMap };
 
 // Write Javascript code!
 const appDiv = document.getElementById('app');
 appDiv.innerHTML = `<h1>JS Starter</h1>`;
 
+    // 519698783226023936
+    // bestBallCalc("523209686364766208")
+    // bestBallCalc("523065345105248256")
+    // bestBallCalc("490196857683701760")
+    // bestBallCalc("523229728710144000")
+    // bestBallCalc("529784074791366656")
+    // bestBallCalc("529760790529761280")
+    // bestBallCalc("523213564570980352")
+    // bestBallCalc("530173547800481792")
+    // bestBallCalc("530465468767469568")
+    // bestBallCalc("347158033576665088")
+    // bestBallCalc("530593525136420864")
+
+var total = 0;
+var input_user = "519698783226023936";
+
+for (let x = 0; x < 10; x ++) {
+  // calcWeek(x, input_user)
+}
+
+
+function addScore(x) {
+  total += x;
+}
+
+calcWeek(9, input_user)
+
+
+function calcWeek(week, input_user) {
 // variables
 var userMap = new Map(); // user_id, display_name
 var rosterMap = new Map(); // owner_id, roster_id, players, taxi
 var rosteredPlayers = new Map();
-import nflplayer from './players.json';
+
 
 // user
 function user() {
@@ -33,7 +62,7 @@ function player(player_name, position, score) {
 Promise.all([
   fetch('https://api.sleeper.app/v1/league/650078285652377600/users'),
   fetch('https://api.sleeper.app/v1/league/650078285652377600/rosters'),
-  fetch('https://api.sleeper.app/v1/league/650078285652377600/matchups/1'),
+  fetch('https://api.sleeper.app/v1/league/650078285652377600/matchups/'+ week),
 ])
   .then(function (responses) {
     // Get a JSON object from each of the responses
@@ -65,19 +94,22 @@ Promise.all([
     }
 
     // mapPlayersToUser()
-    console.log('--- WEEK 1 TOP SCORES ---');
-    bestBallCalc("519698783226023936")
-    bestBallCalc("523209686364766208")
-    bestBallCalc("523065345105248256")
-    bestBallCalc("490196857683701760")
-    bestBallCalc("523229728710144000")
-    bestBallCalc("529784074791366656")
-    bestBallCalc("529760790529761280")
-    bestBallCalc("523213564570980352")
-    bestBallCalc("530173547800481792")
-    bestBallCalc("530465468767469568")
-    bestBallCalc("347158033576665088")
-    bestBallCalc("530593525136420864")
+    console.log("--- WEEK " + week +  " TOP SCORES ---");
+    let tmp = bestBallCalc(input_user)
+    console.log(tmp)
+    addScore(tmp)
+    console.log(total)
+    // bestBallCalc("523209686364766208")
+    // bestBallCalc("523065345105248256")
+    // bestBallCalc("490196857683701760")
+    // bestBallCalc("523229728710144000")
+    // bestBallCalc("529784074791366656")
+    // bestBallCalc("529760790529761280")
+    // bestBallCalc("523213564570980352")
+    // bestBallCalc("530173547800481792")
+    // bestBallCalc("530465468767469568")
+    // bestBallCalc("347158033576665088")
+    // bestBallCalc("530593525136420864")
 
     // console.log(data);
   })
@@ -88,8 +120,6 @@ Promise.all([
 
 function processUserData(data) {
   for (var i = 0; i < data.length; i++) {
-    // console.log("user_id: " + data[i].user_id);
-    // console.log("username: " + data[i].display_name);
     userMap.set(data[i].user_id, data[i].display_name);
   }
 }
@@ -109,7 +139,6 @@ function processMatchUpPlayers(data) {
           return !taxi.includes(el);
         });
 
-        // roster[1].players = players;
 
         for (let p of players) {
           let score = match.players_points[p]
@@ -122,12 +151,6 @@ function processMatchUpPlayers(data) {
     }
   }
 
-  // for (let x of rosterMap) {
-  //   let tmp = x[1].players_info;
-  //   for (let y of tmp) {
-  //     console.log(y)
-  //   }
-  // }
 }
 
 function processRosterData(data) {
@@ -136,10 +159,6 @@ function processRosterData(data) {
 
     // let players = data[i].players;
     let taxi = data[i].taxi;
-
-    // players = players.filter(function (el) {
-    //   return !taxi.includes(el);
-    // });
 
     tmp_user.user_id = data[i].owner_id;
     tmp_user.display_name = userMap.get(data[i].owner_id);
@@ -167,57 +186,6 @@ function populatePlayersInfo() {
       player_info.set(p, tmp_player);
     }
   }
-}
-
-function processMatchUpData(data) {
-  for (let matchup of data) {
-    let players_points = matchup.players_points;
-    for (let i in players_points) {
-      if (rosteredPlayers.get(i) != null) {
-        var tmp_player = rosteredPlayers.get(i);
-        tmp_player.score = players_points[i];
-      }
-    }
-  }
-}
-
-// loop through roster and get individual contestants list of non taxi players
-// fetch their player data from rosteredPlayersMap
-function mapPlayersToUser() {
-  for (let roster of rosterMap) {
-    let current_roster = roster[1];
-    let players = roster[1].players;
-    for (let player of players) {
-      let info = rosteredPlayers.get(player);
-      current_roster.players_info.set(player, info);
-    }
-  }
-}
-
-function test(user_id) {
-  var players = rosterMap.get(user_id).players_info;
-
-  console.log('LEAGUE MEMBER: ' + rosterMap.get(user_id).display_name);
-  console.log('---------- LIST OF PLAYERS ----------');
-
-  let points = 0;
-
-  for (let player of players) {
-    let tmp = player[1];
-    console.log(
-      'Name: ' +
-      tmp.player_name +
-      ', Position: ' +
-      tmp.position +
-      ' Score: ' +
-      tmp.score
-    );
-    points = points + tmp.score;
-  }
-
-  console.log('TOTAL SCORE FOR ALL PLAYER: ' + points);
-
-  //490196857683701760
 }
 
 function bestBallCalc(user_id) {
@@ -414,19 +382,23 @@ function bestBallCalc(user_id) {
     flex3Score +
     sflexScore;
 
-  console.log('Top Scoring QB: ' + qbName + ' - ' + qbScore);
-  console.log('Top Scoring RB1: ' + rb1Name + ' - ' + rb1Score);
-  console.log('Top Scoring RB2: ' + rb2Name + ' - ' + rb2Score);
-  console.log('Top Scoring WR1: ' + wr1Name + ' - ' + wr1Score);
-  console.log('Top Scoring WR2: ' + wr2Name + ' - ' + wr2Score);
-  console.log('Top Scoring WR3: ' + wr3Name + ' - ' + wr3Score);
-  console.log('Top Scoring TE: ' + teName + ' - ' + teScore);
-  console.log('Top Scoring FLEX1: ' + flex1Name + ' - ' + flex1Score);
-  console.log('Top Scoring FLEX2: ' + flex2Name + ' - ' + flex2Score);
-  console.log('Top Scoring FLEX3: ' + flex3Name + ' - ' + flex3Score);
-  console.log('Top Scoring SFLEX: ' + sflexName + ' - ' + sflexScore);
+  // console.log('Top Scoring QB: ' + qbName + ' - ' + qbScore);
+  // console.log('Top Scoring RB1: ' + rb1Name + ' - ' + rb1Score);
+  // console.log('Top Scoring RB2: ' + rb2Name + ' - ' + rb2Score);
+  // console.log('Top Scoring WR1: ' + wr1Name + ' - ' + wr1Score);
+  // console.log('Top Scoring WR2: ' + wr2Name + ' - ' + wr2Score);
+  // console.log('Top Scoring WR3: ' + wr3Name + ' - ' + wr3Score);
+  // console.log('Top Scoring TE: ' + teName + ' - ' + teScore);
+  // console.log('Top Scoring FLEX1: ' + flex1Name + ' - ' + flex1Score);
+  // console.log('Top Scoring FLEX2: ' + flex2Name + ' - ' + flex2Score);
+  // console.log('Top Scoring FLEX3: ' + flex3Name + ' - ' + flex3Score);
+  // console.log('Top Scoring SFLEX: ' + sflexName + ' - ' + sflexScore);
 
   console.log('Best Ball Score: ' + totalScore);
+  return totalScore;
 }
 
 // QB, RB, RB, WR, WR, WR, TE, WRT, WRT, WRT, WRTQ
+}
+
+
